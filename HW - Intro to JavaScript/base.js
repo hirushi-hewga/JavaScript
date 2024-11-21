@@ -144,9 +144,25 @@
 
 
 ////7
-//let numA = +prompt("Enter your number A :")//23
-//let numB = +prompt("Enter your number B :")//15
+//let numA = +prompt("Enter the hours :")
+//let numB = +prompt("Enter the minutes :")
 //let func = function(a,b){return `${23-a}:${60-b}`}
 //alert(func(numA,numB))
 
 
+////8
+//let num = +prompt("Enter a three-digit number :")
+//let func = function(num){return (num%100-num%10)/10}
+//alert(`The second number is ${func(num)}`)
+
+
+////9
+//let num = +prompt("Enter a five-digit number :")
+//let func = function(num){return (num-num%10)/10+num%10*10000}
+//alert(func(num))
+
+
+////10
+//let amount = +prompt("Enter the total amount of sales for the month :")
+//let func = function(a){return 250+a/10}
+//alert(func(amount))
