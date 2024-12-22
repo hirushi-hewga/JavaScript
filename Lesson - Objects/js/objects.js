@@ -100,4 +100,43 @@ alert(`Name : ${person.firstName} ${person.lastName}
 Birthdate : ${person.birthdate}\nCity : ${person.city}
 Address: ${person.address.street} ${person.address.building}
 Cars : ${person.cars[0]}, ${person.cars[1]}, ${person.cars[2]}`)
+
+// function with object
+function addCarToPerson(person, newCar) {
+    person.cars.push(newCar)
+}
+function showAllCars(person) {
+    alert("Cars : " + person.cars)
+}
+
+let name1 = prompt("Enter model of car : ")
+
+addCarToPerson(person, name1)
+showAllCars(person)
+*/
+
+
+/*
+const player = {
+    login:"super_user123",
+    password:"Qwerty",
+    email:"bablafra@gmail.com",
+    score:0,
+
+    print:function() {
+        console.log(`User : ${this.login} with score : ${this.score}`)
+    },
+    increaseScore(value) {
+        this.score += value;
+        if (this.value > 100)
+            this.value = 100
+    }
+}
+
+player.print()
+
+player.login += "!!!"
+player.increaseScore(2)
+
+player.print()
 */
