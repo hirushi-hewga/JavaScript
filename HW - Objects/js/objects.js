@@ -61,9 +61,6 @@ const car = {
         let travelTime = distance / (this.speed / 2)
         let totalTime = travelTime + (Math.floor(travelTime / 4))
         alert(totalTime + 'h')
-        //for (let i = 0; i < distance; i++) {
-        //    travelTime = i / (this.speed / 2)
-        //}
     }
 }
 car.showInfo()
