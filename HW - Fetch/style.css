@@ -1,0 +1,10 @@
+#block {
+    width: 1000px;
+    height: 600px;
+    background-color: lightgray;
+    border-radius: 25px;
+}
+
+#body {
+    background: orangered;
+}
