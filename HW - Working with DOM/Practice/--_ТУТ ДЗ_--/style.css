@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(219, 194, 186);
+    font-weight: bold;
+}
+img {
+    padding: 0 30px 0;
+}
+h1 {
+    text-align: center;
+}
+p {
+    text-align: center;
+}
+nav {
+    text-align: center;
+    background-color: rgb(209, 155, 155);
+    padding: 5px;
+}
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+nav ul li {
+    display: inline-block;
+    border: 1px solid gray;
+    border-radius: 30px;
+    padding: 30px 0;
+}
+nav ul li a {
+    text-decoration: none;
+}
+nav ul li a:hover {
+    text-decoration: underline;
+}
+nav ul:nth-child(1) li:nth-child(1) {
+    background-color: rgb(114, 192, 121);
+}
+nav ul:nth-child(1) li:nth-child(2) {
+    background-color: rgb(192, 114, 114);
+}
+nav ul:nth-child(1) li:nth-child(3) {
+    background-color: rgb(192, 187, 114);
+}
+nav ul:nth-child(1) li:nth-child(4) {
+    background-color: rgb(192, 161, 114);
+}
+nav ul:nth-child(1) li:nth-child(5) {
+    background-color: rgb(114, 192, 160);
+}
+nav ul:nth-child(2) li:nth-child(1) {
+    background-color: rgb(114, 192, 182);
+}
+nav ul:nth-child(2) li:nth-child(2) {
+    background-color: rgb(192, 136, 114);
+}
+nav ul:nth-child(2) li:nth-child(3) {
+    background-color: rgb(144, 114, 192);
+}
+nav ul:nth-child(2) li:nth-child(4) {
+    background-color: rgb(192, 114, 169);
+}
+nav ul:nth-child(2) li:nth-child(5) {
+    background-color: rgb(149, 192, 114);
+}
