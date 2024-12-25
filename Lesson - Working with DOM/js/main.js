@@ -3,6 +3,41 @@
 const tableBody = document.getElementById("table-body")
 const createBtn = document.getElementById("create-btn")
 const deleteBtn = document.getElementById("delete-btn")
+const themeBtn = document.getElementById("theme-btn")
+const navbar = document.getElementById("navbar")
+
+
+themeBtn.onclick = () => {
+    //console.log("My button clicked!!!")
+    if (themeBtn.innerHTML == "Light Header") {
+
+        themeBtn.innerHTML = "Primary Header"
+        // remove light classes
+        //navbar.classList.remove('bg-dark')
+        navbar.classList.remove('navbar-dark')
+        navbar.classList.remove('bg-primary')
+
+        // add dark classes
+        //navbar.classList.add('bg-primary')
+        navbar.classList.add('navbar-light')
+        navbar.classList.add('bg-light')
+
+    } else {
+
+        themeBtn.innerHTML = "Light Header"
+        // delete dark classes
+        //navbar.classList.remove('bg-primary')
+        navbar.classList.remove('navbar-light')
+        navbar.classList.remove('bg-light')
+
+        // add light classes
+        //navbar.classList.add('bg-dark')
+        navbar.classList.add('navbar-dark')
+        navbar.classList.add('bg-primary')
+
+    }
+}
+
 
 tableBody.innerHTML = ""
 let products = []
