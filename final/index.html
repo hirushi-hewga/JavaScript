@@ -1,0 +1,40 @@
+<!DOCTYPE html>  
+<html lang="uk">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Прогноз погоди</title>  
+    <link rel="stylesheet" href="styles.css">  <!-- Правильний шлях до CSS -->  
+</head>  
+<body>  
+    <div class="container">  
+        <h1>Прогноз погоди</h1>  
+        <div>  
+            <label for="citySelect">Виберіть місто:</label>  
+            <select id="citySelect">  
+                <option value="Kyiv">Київ</option>  
+                <option value="Lviv">Львів</option>  
+                <option value="Odesa">Одеса</option>  
+                <option value="Kharkiv">Харків</option>  
+                <!-- Додайте більше міст за потреби -->  
+            </select>  
+            <button id="getWeatherBtn">Отримати погоду</button>  
+        </div>  
+        <div class="tabs">  
+            <button id="todayTab" class="active">Сьогодні</button>  
+            <button id="forecastTab">Прогноз на 5 днів</button>  
+        </div>  
+        <div class="tab-content" id="today">  
+            <div id="currentWeather"></div>  
+            <div id="hourlyForecast"></div>  
+            <div id="nearbyPlaces"></div>  
+        </div>  
+        <div class="tab-content" id="forecast" style="display: none;">  
+            <div id="fiveDayForecast"></div>  
+            <div id="dailyHourlyForecast"></div>  
+        </div>  
+        <div id="error" style="display: none;">Місто не знайдено. Введіть іншу локацію.</div>  
+    </div>  
+    <script src="script.js"></script>  <!-- Правильний шлях до JS -->  
+</body>  
+</html>
