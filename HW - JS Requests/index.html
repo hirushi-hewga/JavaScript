@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="./style.css">  
     <title>Movie Search</title>  
 </head>  
-<body>  
+<body style="display: flex; flex-direction: column; justify-content: center; align-items: center;">  
     <div id="search" class="p-3 m-3">  
         <div>  
-            <h2>Search</h2>  
+            <h2 class="text-center">Search</h2>  
             <label for="titleSelect" class="form-label mt-4">Title</label>  
             <select class="form-select" id="titleSelect">  
               <option value="potter">Harry Potter</option>  
@@ -19,6 +19,7 @@
               <option value="avengers">Avengers</option>  
               <option value="batman">Batman</option>  
               <option value="inception">Inception</option>  
+              <option value="disney">Disney</option>  
             </select>  
           </div>  
           <div>  
@@ -31,9 +32,22 @@
           <button class="btn btn-primary mt-3" id="searchButton">Search</button>  
     </div>  
 
-    <h2>Films</h2>  
-    <div id="films" class="d-flex flex-wrap"></div>  
-    <div id="pagination" class="d-flex justify-content-center mt-3"></div>  
+
+
+
+    <h2  class="text-center mt-5">Films</h2>  
+    <div id="films" class="d-flex flex-wrap"></div>
+
+
+
+
+    <nav aria-label="Page navigation example">
+      <ul class="pagination m-3" id="pagination">
+      </ul>
+    </nav>
+
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>  
     <script src="./script.js"></script>  

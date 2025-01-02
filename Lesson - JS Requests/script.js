@@ -1,4 +1,4 @@
-const url = "https://swapi.dev/api/people/?page=";
+const url = "https://swapi.py4e.com/api/people/?page=";
 
 // fetch(url)
 //     .then(response => {
@@ -24,65 +24,60 @@ const url = "https://swapi.dev/api/people/?page=";
 // "gender": "n/a",
 
 
-{/* <tr>
+/*{ <tr>
         <td>Name</td>
         <td>Hair color</td>
         <td>Eye colo</td>
         <td>Birth year</td>
         <td>Gender</td>
         <td>Height</td>
-</tr> */}
+</tr> }*/
 
 async function swapiGet(page) {    
     try {
         const response = await fetch(url + page);
         const data = await response.json();
-
-        const pageCount = Math.ceil(data.count / 10);
-        const pagination = document.getElementById("pagination");
-
-        pagination.innerHTML = "";
-
-        let prevPage = page - 1;
-        if(page === "1") {
-            prevPage = "1";
-        }
-
-        let nextPage = parseInt(page) + 1;
-        if(page == pageCount) {
-            nextPage = pageCount.toString();
-        }
-
-        pagination.innerHTML += `<li class="page-item" onclick="swapiGet('${prevPage}')"><a class="page-link" href="#">prev</a></li>`;
-        for(let i = 1; i <= pageCount; i++) {
-            pagination.innerHTML += `<li class="page-item" onclick="swapiGet('${i}')"><a class="page-link" href="#">${i}</a></li>`;
-        }
-        pagination.innerHTML += `<li class="page-item" onclick="swapiGet('${nextPage}')"><a class="page-link" href="#">next</a></li>`;
-
-        console.log(data.results);
         
-        const tbody = document.getElementById("tbody");
-        tbody.innerHTML = "";
-        for (let i = 0; i < data.results.length; i++) {
-            const person = data.results[i];
-            tbody.innerHTML += `<tr>
-                <td>${person.name}</td>
-                <td>${person.hair_color}</td>
-                <td>${person.eye_color}</td>
-                <td>${person.birth_year}</td>
-                <td>${person.gender}</td>
-                <td>${person.height}</td>
-            </tr>`;
+        const pageCount = Math.ceil(data.count / 10)
+        const pagination = document.getElementById('pagination')
+
+        pagination.innerHTML = ''
+
+        let prevPage = parseInt(page) - 1
+        let nextPage = parseInt(page) + 1
+        if (page === '1') {
+            prevPage = '1'
         }
+        if (page === `${pageCount}`) {
+            nextPage = pageCount.toString()
+        }
+
+        pagination.innerHTML += `<li onclick="swapiGet('${prevPage}')" class="page-item"><a class="page-link" href="#">prev</a></li>`
+        for(let i = 1; i <= pageCount; i++) {
+            pagination.innerHTML += `<li onclick="swapiGet('${i}')" class="page-item"><a class="page-link" href="#">${i}</a></li>`
+        }
+        pagination.innerHTML += `<li onclick="swapiGet('${nextPage}')" class="page-item"><a class="page-link" href="#">next</a></li>`
+        
+        //<li class="page-item"><a class="page-link" href="#">1</a></li>
+        
+        //console.log(pageCount)
+        //console.log(data.results)
+        
+        const tbody = document.getElementById('tbody')
+        tbody.innerHTML = ''
+        data.results.forEach(person => {
+            tbody.innerHTML += `<tr>
+                                  <td>${person.name}</td>
+                                  <td>${person.hair_color}</td>
+                                  <td>${person.eye_color}</td>
+                                  <td>${person.birth_year}</td>
+                                  <td>${person.gender}</td>
+                                  <td>${person.height}</td>
+                                </tr>`
+        });
     } catch (error) {
         console.log(error);
     }
 }
 
 swapiGet("1");
-
-
-function selectHandler() {
-    const type = document.getElementById("type").value;
-    
-}
