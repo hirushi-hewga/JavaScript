@@ -1,4 +1,4 @@
-const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf'; // Вставте свій API ключ  
+const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf';
 const citySelect = document.getElementById('citySelect');  
 const getWeatherBtn = document.getElementById('getWeatherBtn');  
 const todayTab = document.getElementById('todayTab');  
@@ -22,25 +22,23 @@ getWeatherBtn.addEventListener('click', () => {
     const selectedCity = citySelect.value;  
     getWeather(selectedCity);  
 });  
-
-// Функція для показу вкладок  
+ 
 function showTab(tab) {  
     if (tab === 'today') {  
         todayTab.classList.add('active');  
         forecastTab.classList.remove('active');  
         document.getElementById('today').style.display = 'block';  
         document.getElementById('forecast').style.display = 'none';  
-        getWeather(citySelect.value); // Отримати погоду при активації вкладки  
+        getWeather(citySelect.value);
     } else {  
         todayTab.classList.remove('active');  
         forecastTab.classList.add('active');  
         document.getElementById('today').style.display = 'none';  
         document.getElementById('forecast').style.display = 'block';  
-        getFiveDayForecast(citySelect.value); // Отримати 5-денний прогноз при активації вкладки  
+        getFiveDayForecast(citySelect.value); 
     }  
 }  
 
-// Функція для отримання погоди  
 async function getWeather(city) {  
     try {  
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);  
@@ -59,12 +57,10 @@ async function getWeather(city) {
     }  
 }  
 
-// Функція для відображення поточної погоди  
 function displayCurrentWeather(data) {  
     const { main, weather, wind, sys, dt } = data;  
     const date = new Date(dt * 1000).toLocaleDateString();  
 
-    // Перевірка наявності даних  
     if (!sys || !sys.sunrise || !sys.sunset) {  
         throw new Error('Дані про сонце недоступні');  
     }  
@@ -88,7 +84,6 @@ function displayCurrentWeather(data) {
     getNearbyPlaces(data.coord.lat, data.coord.lon);  
 }  
 
-// Функція для отримання погодинного прогнозу  
 async function getHourlyForecast(lat, lon) {  
     try {  
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`);  
@@ -116,12 +111,9 @@ async function getHourlyForecast(lat, lon) {
     }  
 }  
 
-// Функція для отримання найближчих міст  
 async function getNearbyPlaces(lat, lon) {  
-    // Ваш код для отримання найближчих міст  
 }  
-
-// Функція для отримання 5-денного прогнозу  
+ 
 async function getFiveDayForecast(city) {  
     try {  
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`);  
@@ -138,7 +130,6 @@ async function getFiveDayForecast(city) {
     }  
 }  
 
-// Функція для відображення 5-денного прогнозу  
 function displayFiveDayForecast(data) {  
     let forecastHtml = '<h3>5-денний прогноз</h3>';  
     const days = {};  
@@ -166,7 +157,6 @@ function displayFiveDayForecast(data) {
     fiveDayForecastDiv.innerHTML = forecastHtml;  
 }  
 
-// Функція для отримання прогнозу для вибраного дня  
 async function getDailyForecast(date) {  
     try {  
         const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?appid=${apiKey}`);  
@@ -200,7 +190,6 @@ async function getDailyForecast(date) {
     }  
 }  
 
-// Виклик функції для отримання погоди при завантаженні сторінки  
 window.onload = () => {  
-    getWeather(citySelect.value); // Отримати прогноз для початково вибраного міста  
+    getWeather(citySelect.value);
 };  
