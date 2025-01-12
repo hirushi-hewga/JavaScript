@@ -1,0 +1,14 @@
+.form-container {
+    width: 50%;
+    margin: auto;
+    padding: 20px;
+    background-color: darkgray;
+}
+
+.table-container {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    background-color: darkgray;
+    margin-bottom: 20px;
+}
