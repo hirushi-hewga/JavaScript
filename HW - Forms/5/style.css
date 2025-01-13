@@ -1,0 +1,19 @@
+.form-container {
+    width: 60%;
+    margin: auto;
+    padding: 20px;
+    background-color: darkgray;
+}
+
+.color-container {
+    border: 1px solid gray;
+    width: 26%;
+    display: inline-flex;
+    align-items:center;
+    background-color: darkgray;
+}
+
+.color {
+    width: 60px;
+    height: 60px;
+}
