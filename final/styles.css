@@ -1,20 +1,47 @@
 body {  
     font-family: Arial, sans-serif;  
     background-color: #f4f4f4;  
-    margin: 0;  
-    padding: 20px;  
+    margin: 0;
 }  
 
 .container {  
-    max-width: 600px;  
-    margin: auto;  
+    width: 90%; 
+    margin: auto;
     background: white;  
-    padding: 20px;  
-    border-radius: 10px;  
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);  
+    border-radius: 15px;  
+    box-shadow: 10px 5px 10px rgba(0, 0, 0, 0.1);  
+    margin-top: 8px;
+    margin-bottom: 16px;
+    padding: 0px;
 }  
 
-.tabs {  
+.container-head {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-weight: bold;
+    background-color: rgb(159, 191, 238);
+    align-items: center;
+    border-radius: 15px 15px 0 0;  
+    padding: 10px;
+}
+
+.container-body {
+    border-radius: 0 0 15px 15px; 
+    background-color: darkslategrey;
+    box-shadow: inset 6px 3px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+p {
+    margin: 0px;
+}
+
+
+
+
+
+/* .tabs {  
     display: flex;  
     justify-content: space-between;  
     margin-bottom: 20px;  
@@ -36,4 +63,4 @@ body {
 
 .tab-content.active {  
     display: block;  
-}  
+}   */
