@@ -28,7 +28,7 @@ body {
 
 .container-body {
     border-radius: 0 0 15px 15px; 
-    background-color: darkslategrey;
+    background-color: rgb(79, 131, 131);
     box-shadow: inset 6px 3px 10px rgba(0, 0, 0, 0.1);
     padding: 10px;
 }

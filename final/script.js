@@ -7,37 +7,84 @@ function forecastHandler() {
 
 
 
-async function loadWeather() {
-    const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf';
-    const data = await getCityData(apiKey)
-    setCurrentWeather(data)
+async function searchHandler() {
+    const input = document.getElementById("input").value
+    document.getElementById("input").value = ""
+    loadWeather(input.trim())
 }
-loadWeather()
 
 
 
-async function getCity(lat, lon, apiKey) {
+async function loadWeather(input="") {
+    const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf';
+    const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
+    if (!input || !dataByCity.status) {
+        const currentWeatherByPos = await getCityByPos(apiKey)
+        const hourlyForecastByPos = await getHourlyCityByPos(apiKey)
+        setCurrentWeather(currentWeatherByPos)
+        setHourlyWeather(hourlyForecastByPos)
+    } else {
+        setCurrentWeather(currentWeatherByCity.data)
+    }
+}
+
+
+
+async function gerCurrentWeatherByName(input, apiKey) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=${apiKey}&units=metric`
+
+    const weatherData = {}
+    const responce = await fetch(url)
+    weatherData.status = responce.status === 200
+    weatherData.data = await responce.json()
+    return weatherData
+}
+
+
+
+async function getCurrentWeatherByPos(lat, lon, apiKey) {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
     
     const responce = await fetch(url)
-    console.log("Status responce " + responce.status)
     const data = await responce.json()
     return data
 }
 
 
 
-async function getCityData(apiKey) {
+async function getHourlyWeatherByPos(lat, lon, apiKey) {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+
+    const responce = await fetch(url)
+    const data = await responce.json()
+    return data
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadWeather()
+})
+
+
+
+async function getCurrentPos() {
+    return await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(position => {  
+            const {latitude, longitude} = position.coords
+            resolve({latitude, longitude})
+        }, (error) => {
+            reject(error)
+        })
+    });  
+}
+
+
+
+async function getCityByPos(apiKey) {
     if ("geolocation" in navigator) {
-        const { latitude, longitude } = await new Promise((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(position => {  
-                const {latitude, longitude} = position.coords
-                resolve({latitude, longitude})
-            }, (error) => {
-                reject(error)
-            })
-        });  
-        const data = await getCity(latitude, longitude, apiKey)
+        const { latitude, longitude } = await getCurrentPos()
+        const data = await getCurrentWeatherByPos(latitude, longitude, apiKey)
         return data
     } else {
         console.error('Geolocation is not supported by this browser.');
@@ -46,14 +93,26 @@ async function getCityData(apiKey) {
 
 
 
-async function setCurrentWeather(data) {
+async function getHourlyCityByPos(apiKey) {
+    if ("geolocation" in navigator) {
+        const { latitude, longitude } = await getCurrentPos()
+        const data = await getHourlyWeatherByPos(latitude, longitude, apiKey)
+        return data
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+    }
+}
+
+
+
+function setCurrentWeather(data) {
     const currentWeather = document.getElementById("currentWeather")
     document.getElementById("input").placeholder = `${data.name}, ${data.sys.country}`
     console.log(data)
 
     currentWeather.innerHTML = `<div class="container-head">
                 <p class="text-primary">CURRENT WEATHER</p>
-                <p class="text-primary">{date}</p>
+                <p class="text-primary">${formatDate(data.dt)}</p>
             </div>
             <div style="display: flex; justify-content: space-evenly;" class="container-body">
                 <div style="display:flex; flex-direction:column; align-items:center">
@@ -73,7 +132,7 @@ async function setCurrentWeather(data) {
                     <div class="ps-1">
                         <p>${formatTime(data.sys.sunrise)}</p>
                         <p>${formatTime(data.sys.sunset)}</p>
-                        <p>${formatTime(data.dt)}</p>
+                        <p>${getDifference(data.sys.sunrise, data.sys.sunset)}</p>
                     </div>
                 </div>
             </div>`
@@ -81,10 +140,51 @@ async function setCurrentWeather(data) {
 
 
 
-function formatTime(unixTimestamp) {
-    const date = new Date(unixTimestamp * 1000)
-    const options = {hour: '2-digit', minute: '2-digit', hour12: true}
+function formatDate(timestamp) {
+    const date = new Date(timestamp * 1000)
+    return `${date.getFullYear()}.` + 
+           `${String(date.getMonth() + 1).padStart(2, '0')}.` + 
+           `${String(date.getDate()).padStart(2, '0')}`
+}
+
+
+
+function formatTime(timestamp) {
+    const date = new Date(timestamp * 1000)
+    const options = {hour: 'numeric', minute: '2-digit', hour12: true}
     return date.toLocaleTimeString('en-US', options)
+}
+
+
+
+function getDifference(time1, time2) {
+    const difference = time1 < time2 ? (time2 - time1) * 1000 : (time1 - time2) * 1000
+    const hours = Math.floor(difference / (1000 * 60 * 60))
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+    return `${hours}:${minutes.toString().padStart(2, '0')} hr`
+}
+
+
+
+function setHourlyWeather(data) {
+    // const hourlyWeather = document.getElementById("hourlyWeather")
+    // data = data.list.slice(0, 6)
+    // console.log(data)
+
+    // let weather = ""
+
+    // data.forEach(item => {
+    //     weather += `<div style="width: 110px">
+    //                     <p style="font-size: 1.05em;" class="text-body-secondary">Today</p>
+    //                     <img src="https://openweathermap.org/img/wn/04d@2x.png">
+    //                     <p style="font-size: 1.05em;" class="text-body-secondary">Forecast</p>
+    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">Temp (°C)</p>
+    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">RealFeel</p>
+    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">Wind (km/h)</p>
+    //                 </div>`
+
+    // })
+    // hourlyWeather.innerHTML += weather
 }
 
 
