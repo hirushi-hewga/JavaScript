@@ -1,0 +1,34 @@
+body {
+    padding: 20px;
+}
+
+.text {
+    color: red;
+    font-size: 1.3em;
+}
+
+.light {
+    background-color: wheat;
+}
+
+.page-link {
+    text-decoration: none;
+    font-size: 1.3em;
+    color: darkcyan;
+    margin: 0px 10px;
+}
+
+.page-link:hover {
+    opacity: .95;
+}
+
+nav {
+    background-color: black;
+}
+
+.square-styles {
+    display: inline-block; 
+    height: 100px; 
+    width: 100px; 
+    margin: 5px;
+}

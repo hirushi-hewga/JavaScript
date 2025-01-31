@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css">
+        <script src="lib/jquery-3.7.1.min.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+        <script src="script.js" defer></script>
+        <title>Jquery</title>
+    </head>
+    <body>
+        <nav style="display: flex; flex-direction: row;">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contacts">Contacts</a>
+            <span onclick="changeTheme()">🌓</span>
+        </nav>
+        <h1>Jquery</h1>
+        <p onclick="deleteClasses()" class="text" id="p1">Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, unde?</p>
+        <p onclick="toggleClasses()" class="text" id="p2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus accusamus eligendi magnam assumenda laborum quasi!</p>
+        <h2>Title</h2>
+        <a href="/">Link</a>
+        <ol onclick="addStyle()">
+            <li>January</li>
+            <li>February</li>
+            <li>March</li>
+            <li>April</li>
+        </ol>
+
+        <div style="text-align: center;">
+            <img id="img-cat" src="https://gratisography.com/wp-content/uploads/2024/10/gratisography-cool-cat-800x525.jpg" alt="">
+        </div>
+        <div>
+            <button onclick="hideImg()" class="btn btn-dark">Hide</button>
+            <button onclick="showImg()" class="btn btn-dark">Show</button>
+            <button onclick="toggleImg()" class="btn btn-dark">Toggle</button>
+        </div>
+
+        <div style="display: flex;">
+            <form style="display: flex; flex-direction: column; border: 1px solid black; background-color: lightcyan;">
+                <input type="text">
+                <input type="text">
+                <input type="text">
+                <input type="text">
+            </form>
+        </div>
+
+        <div id="maindiv" style="margin-top: 100px; background-color: lightgray; height: 1000px;">
+            <button onclick="addSquare()" class="btn btn-dark">Add sqaure</button>
+            <button onclick="prependSquare()" class="btn btn-dark">Prepend sqaure</button>
+            <button class="btn btn-danger" onclick="removeDiv()">Remove div</button>
+            <button class="btn btn-success" onclick="addEvents()">Add events</button>
+            <input id="squreColor" type="color">
+            <div id="container">
+                
+            </div>
+        </div>
+    </body>
+</html>
