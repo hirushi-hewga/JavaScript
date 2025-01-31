@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="style.css">
+        <title>Timeout</title>
+    </head>
+    <body>
+        <h1 id="clock" class="clock">18:39:00</h1>
+        <h1 style="text-align: center;">Happy new year</h1>
+        <h1 id="nyTimer" class="timer">18:39:00</h1>
+        <button style="margin: 5px;" onclick="startHandler(document.getElementById('timeout').value)">Start</button>
+        <input value="500" id="timeout" type="number">
+        <br>
+        <button style="margin: 5px;" id="stopBtn">Stop</button>
+        <br>
+        <button style="margin: 5px;" onclick="resetList()">Clear</button>
+        <ol id="list">
+
+        </ol>
+        <script src="script.js"></script>
+    </body>
+</html>
