@@ -17,13 +17,14 @@ async function searchHandler() {
 
 async function loadWeather(input="") {
     const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf';
-    const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
     if (!input || !dataByCity.status) {
         const currentWeatherByPos = await getCityByPos(apiKey)
         const hourlyForecastByPos = await getHourlyCityByPos(apiKey)
         setCurrentWeather(currentWeatherByPos)
         setHourlyWeather(hourlyForecastByPos)
+        setNearbyPlaces(apiKey)
     } else {
+        const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
         setCurrentWeather(currentWeatherByCity.data)
     }
 }
@@ -120,8 +121,8 @@ function setCurrentWeather(data) {
                     <p class="text-body-secondary">${data.weather[0].main}</p>
                 </div>
                 <div style="display:flex; flex-direction:column; justify-content:center;">
-                    <h1>${data.main.temp}°C</h1>
-                    <p style="font-size: 0.9em;">Real Feel ${data.main.feels_like}°</p>
+                    <h1>${Math.round(data.main.temp)}°C</h1>
+                    <p style="font-size: 0.9em;">Real Feel ${Math.round(data.main.feels_like)}°</p>
                 </div>
                 <div style="display:flex; align-items:center">
                     <div class="pe-1">
@@ -167,24 +168,62 @@ function getDifference(time1, time2) {
 
 
 function setHourlyWeather(data) {
-    // const hourlyWeather = document.getElementById("hourlyWeather")
-    // data = data.list.slice(0, 6)
-    // console.log(data)
+    const hourlyWeather = document.getElementById("hourlyWeather")
+    data = data.list.slice(0, 6)
+    console.log(data)
 
-    // let weather = ""
+    let weather = ""
 
-    // data.forEach(item => {
-    //     weather += `<div style="width: 110px">
-    //                     <p style="font-size: 1.05em;" class="text-body-secondary">Today</p>
-    //                     <img src="https://openweathermap.org/img/wn/04d@2x.png">
-    //                     <p style="font-size: 1.05em;" class="text-body-secondary">Forecast</p>
-    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">Temp (°C)</p>
-    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">RealFeel</p>
-    //                     <hr class="mt-2 mb-2"><p class="text-body-secondary">Wind (km/h)</p>
-    //                 </div>`
+    data.forEach(item => {
+        const icon = item.weather[0].icon
+        const temp = Math.round(item.main.temp.toFixed(1))
+        const feelsLike = Math.round(item.main.feels_like.toFixed(1))
+        const wind = (item.wind.speed * 3.6).toFixed(1)
 
-    // })
-    // hourlyWeather.innerHTML += weather
+        weather += `<div style="width: 110px; display: flex; flex-direction: column;">
+                        <p style="font-size: 1.05em;" class="text-body-secondary">${item.dt_txt.split(' ')[1].slice(0, 5)}</p>
+                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png">
+                        <p style="font-size: 1.05em; flex-grow: 1;" class="text-body-secondary">${item.weather[0].description}</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${temp}°</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${feelsLike}°</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${wind}</p>
+                    </div>`
+    })
+    hourlyWeather.innerHTML = weather
+}
+
+
+
+async function getNearbyPlaces(apiKey)
+{
+    const { latitude, longitude } = await getCurrentPos()
+    const limit = 4
+    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${latitude}+${longitude}/nearbyCities?radius=100&limit=${limit}`
+    const responce = await fetch(url, {
+        method: "GET",
+        headers: {
+            "X-RapidAPI-Key": "ae64cde335msh0c4fb4f82e854b1p1556ffjsn3b5d3d5f7d67",
+            "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com"
+        }
+    })
+    const result = await responce.json()
+    const cities = result.data
+    let data = []
+    cities.forEach(async city => {
+        const lat = city.latitude
+        const lon = city.longitude
+        const weatherData = await getCurrentWeatherByPos(lat, lon, apiKey)
+        data.push({cityName: city.name, weather: weatherData})
+    })
+    return data
+}
+
+
+
+function setNearbyPlaces(apiKey)
+{
+    const data = getNearbyPlaces(apiKey)
+    console.log(data)
 }
 
 
