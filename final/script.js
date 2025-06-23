@@ -20,9 +20,10 @@ async function loadWeather(input="") {
     if (!input || !dataByCity.status) {
         const currentWeatherByPos = await getCityByPos(apiKey)
         const hourlyForecastByPos = await getHourlyCityByPos(apiKey)
+        //const nearbyPlacesWeather = await getNearbyPlaces(apiKey)
         setCurrentWeather(currentWeatherByPos)
         setHourlyWeather(hourlyForecastByPos)
-        setNearbyPlaces(apiKey)
+        //setNearbyPlaces(nearbyPlacesWeather)
     } else {
         const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
         setCurrentWeather(currentWeatherByCity.data)
@@ -109,7 +110,6 @@ async function getHourlyCityByPos(apiKey) {
 function setCurrentWeather(data) {
     const currentWeather = document.getElementById("currentWeather")
     document.getElementById("input").placeholder = `${data.name}, ${data.sys.country}`
-    console.log(data)
 
     currentWeather.innerHTML = `<div class="container-head">
                 <p class="text-primary">CURRENT WEATHER</p>
@@ -170,7 +170,6 @@ function getDifference(time1, time2) {
 function setHourlyWeather(data) {
     const hourlyWeather = document.getElementById("hourlyWeather")
     data = data.list.slice(0, 6)
-    console.log(data)
 
     let weather = ""
 
@@ -197,40 +196,55 @@ function setHourlyWeather(data) {
 async function getNearbyPlaces(apiKey)
 {
     const { latitude, longitude } = await getCurrentPos()
-    const limit = 4
-    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${latitude}+${longitude}/nearbyCities?radius=100&limit=${limit}`
+    const limit = 6
+    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${latitude}+${longitude}/nearbyPlaces?limit=${limit}&offset=0&types=CITY&radius=100`
     const responce = await fetch(url, {
         method: "GET",
         headers: {
-            "X-RapidAPI-Key": "ae64cde335msh0c4fb4f82e854b1p1556ffjsn3b5d3d5f7d67",
-            "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com"
+            "x-rapidapi-key": "ae64cde335msh0c4fb4f82e854b1p1556ffjsn3b5d3d5f7d67",
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com"
         }
     })
     const result = await responce.json()
     const cities = result.data
-    let data = []
-    cities.forEach(async city => {
+    const data = []
+    await cities.forEach(async city => {
         const lat = city.latitude
         const lon = city.longitude
         const weatherData = await getCurrentWeatherByPos(lat, lon, apiKey)
-        data.push({cityName: city.name, weather: weatherData})
+        data.push({cityName: city.name, icon: weatherData.weather[0].icon, temp: Math.round(weatherData.main.temp.toFixed(1))})
     })
     return data
 }
 
 
 
-function setNearbyPlaces(apiKey)
+function setNearbyPlaces(data)
 {
-    const data = getNearbyPlaces(apiKey)
+    const nearbyWeather = document.getElementById("nearbyWeather")
+    let weather = ""
     console.log(data)
+    console.log(Array.isArray(data))
+
+    data.forEach(item => {
+        console.log(item)
+        weather += `<div class="d-flex m-1" style="justify-content: space-between; align-items: center; background-color: rgb(130, 177, 179); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1); border-radius: 5px;">
+                        <p class="text-body-secondary p-2 ms-2">${item.cityName}</p>
+                        <div class="me-4" style="display: flex; align-items: center;">
+                            <img class="me-3" style="height: 30px;" src="https://openweathermap.org/img/wn/${item.icon}@2x.png"/>
+                            <p class="text-body-secondary">${item.temp}°C</p>
+                        </div>
+                    </div>`
+    })
+
+    nearbyWeather.innerHTML = weather
 }
 
 
 
+                    
 
-
-
+                        
 
 
 
