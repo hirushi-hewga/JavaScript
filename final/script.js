@@ -20,10 +20,10 @@ async function loadWeather(input="") {
     if (!input || !dataByCity.status) {
         const currentWeatherByPos = await getCityByPos(apiKey)
         const hourlyForecastByPos = await getHourlyCityByPos(apiKey)
-        //const nearbyPlacesWeather = await getNearbyPlaces(apiKey)
+        const nearbyPlacesWeather = await getNearbyPlaces(apiKey)
         setCurrentWeather(currentWeatherByPos)
         setHourlyWeather(hourlyForecastByPos)
-        //setNearbyPlaces(nearbyPlacesWeather)
+        setNearbyPlaces(nearbyPlacesWeather)
     } else {
         const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
         setCurrentWeather(currentWeatherByCity.data)
@@ -207,13 +207,18 @@ async function getNearbyPlaces(apiKey)
     })
     const result = await responce.json()
     const cities = result.data
-    const data = []
-    await cities.forEach(async city => {
-        const lat = city.latitude
-        const lon = city.longitude
-        const weatherData = await getCurrentWeatherByPos(lat, lon, apiKey)
-        data.push({cityName: city.name, icon: weatherData.weather[0].icon, temp: Math.round(weatherData.main.temp.toFixed(1))})
-    })
+    const data = await Promise.all(
+        cities.map(async city => {
+            const lat = city.latitude;
+            const lon = city.longitude;
+            const weatherData = await getCurrentWeatherByPos(lat, lon, apiKey);
+            return {
+                cityName: city.name,
+                icon: weatherData.weather[0].icon,
+                temp: Math.round(weatherData.main.temp)
+            };
+        })
+    );
     return data
 }
 
@@ -222,13 +227,11 @@ async function getNearbyPlaces(apiKey)
 function setNearbyPlaces(data)
 {
     const nearbyWeather = document.getElementById("nearbyWeather")
+    
     let weather = ""
-    console.log(data)
-    console.log(Array.isArray(data))
 
     data.forEach(item => {
-        console.log(item)
-        weather += `<div class="d-flex m-1" style="justify-content: space-between; align-items: center; background-color: rgb(130, 177, 179); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1); border-radius: 5px;">
+        weather += `<div class="d-flex m-1" style="justify-content: space-between; align-items: center; background-color: rgb(130, 177, 179); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1); box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.19); border-radius: 5px;">
                         <p class="text-body-secondary p-2 ms-2">${item.cityName}</p>
                         <div class="me-4" style="display: flex; align-items: center;">
                             <img class="me-3" style="height: 30px;" src="https://openweathermap.org/img/wn/${item.icon}@2x.png"/>
