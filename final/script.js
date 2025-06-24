@@ -9,42 +9,53 @@ function forecastHandler() {
 
 async function searchHandler() {
     const input = document.getElementById("input").value
+    if (input.trim() === "") return
     document.getElementById("input").value = ""
     loadWeather(input.trim())
 }
 
 
 
-async function loadWeather(input="") {
-    const apiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf';
-    if (!input || !dataByCity.status) {
-        const currentWeatherByPos = await getCityByPos(apiKey)
-        const hourlyForecastByPos = await getHourlyCityByPos(apiKey)
-        const nearbyPlacesWeather = await getNearbyPlaces(apiKey)
-        setCurrentWeather(currentWeatherByPos)
-        setHourlyWeather(hourlyForecastByPos)
-        setNearbyPlaces(nearbyPlacesWeather)
+document.addEventListener("DOMContentLoaded", () => {
+    loadWeather("geolocation" in navigator ? "" : "Rivne")
+})
+
+
+
+async function loadWeather(input) {
+    const weatherApiKey = 'ec2a9d7945ae33bb1f7ff0b23ef65ecf'
+    const geoDbApiKey = 'ae64cde335msh0c4fb4f82e854b1p1556ffjsn3b5d3d5f7d67'
+    const { latitude, longitude } = await getCurrentPos()
+    if (!input) {
+        const currentWeather = await getCurrentWeatherByPos(weatherApiKey, latitude, longitude)
+        const hourlyWeather = await getHourlyWeatherByPos(weatherApiKey)
+        const nearbyWeather = await getNearbyWeatherByPos(geoDbApiKey, weatherApiKey)
+        setCurrentWeather(currentWeather)
+        setHourlyWeather(hourlyWeather)
+        setNearbyWeather(nearbyWeather)
     } else {
-        const currentWeatherByCity = await gerCurrentWeatherByName(input, apiKey)
-        setCurrentWeather(currentWeatherByCity.data)
+        const currentWeather = await gerCurrentWeatherByCity(input, weatherApiKey)
+        const hourlyWeather = await getHourlyWeatherByCity(input, weatherApiKey)
+        const nearbyWeather = await getNearbyWeatherByCity(input, geoDbApiKey, weatherApiKey)
+        setCurrentWeather(currentWeather)
+        setHourlyWeather(hourlyWeather)
+        setNearbyWeather(nearbyWeather)
     }
 }
 
 
 
-async function gerCurrentWeatherByName(input, apiKey) {
+async function gerCurrentWeatherByCity(input, apiKey) {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=${apiKey}&units=metric`
 
-    const weatherData = {}
     const responce = await fetch(url)
-    weatherData.status = responce.status === 200
-    weatherData.data = await responce.json()
-    return weatherData
+    const data = await responce.json()
+    return data
 }
 
 
 
-async function getCurrentWeatherByPos(lat, lon, apiKey) {
+async function getCurrentWeatherByPos(apiKey, lat, lon) {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
     
     const responce = await fetch(url)
@@ -54,8 +65,8 @@ async function getCurrentWeatherByPos(lat, lon, apiKey) {
 
 
 
-async function getHourlyWeatherByPos(lat, lon, apiKey) {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+async function getHourlyWeatherByCity(input, apiKey) {
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${input}&appid=${apiKey}&units=metric`
 
     const responce = await fetch(url)
     const data = await responce.json()
@@ -64,45 +75,93 @@ async function getHourlyWeatherByPos(lat, lon, apiKey) {
 
 
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadWeather()
-})
+async function getHourlyWeatherByPos(apiKey) {
+    const { latitude, longitude } = await getCurrentPos()
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`
+
+    const responce = await fetch(url)
+    const data = await responce.json()
+    return data
+}
 
 
 
-async function getCurrentPos() {
-    return await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(position => {  
-            const {latitude, longitude} = position.coords
-            resolve({latitude, longitude})
-        }, (error) => {
-            reject(error)
+async function getNearbyWeatherByCity(input, geoDbApiKey, weatherApiKey)
+{
+    const cityId = await getCityIdByName(input, geoDbApiKey)
+    const limit = 6
+    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/places/${cityId}/nearbyPlaces?limit=${limit}&offset=0&types=CITY&radius=100`
+    const responce = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-rapidapi-key": geoDbApiKey,
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com"
+        }
+    })
+    const result = await responce.json()
+    const cities = result.data
+    const data = await Promise.all(
+        cities.map(async city => {
+            const lat = city.latitude;
+            const lon = city.longitude;
+            const weatherData = await getCurrentWeatherByPos(weatherApiKey, lat, lon);
+            return {
+                cityName: city.name,
+                icon: weatherData.weather[0].icon,
+                temp: Math.round(weatherData.main.temp)
+            };
         })
-    });  
+    );
+    return data
 }
 
 
 
-async function getCityByPos(apiKey) {
-    if ("geolocation" in navigator) {
-        const { latitude, longitude } = await getCurrentPos()
-        const data = await getCurrentWeatherByPos(latitude, longitude, apiKey)
-        return data
-    } else {
-        console.error('Geolocation is not supported by this browser.');
-    }
+async function getNearbyWeatherByPos(geoDbApiKey, weatherApiKey)
+{
+    const { latitude, longitude } = await getCurrentPos()
+    const limit = 6
+    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${latitude}+${longitude}/nearbyPlaces?limit=${limit}&offset=0&types=CITY&radius=100`
+    const responce = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-rapidapi-key": geoDbApiKey,
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com"
+        }
+    })
+    const result = await responce.json()
+    const cities = result.data
+    console.log(cities)
+    const data = await Promise.all(
+        cities.map(async city => {
+            const lat = city.latitude;
+            const lon = city.longitude;
+            const weatherData = await getCurrentWeatherByPos(weatherApiKey, lat, lon);
+            return {
+                cityName: city.name,
+                icon: weatherData.weather[0].icon,
+                temp: Math.round(weatherData.main.temp)
+            };
+        })
+    );
+    return data
 }
 
 
 
-async function getHourlyCityByPos(apiKey) {
-    if ("geolocation" in navigator) {
-        const { latitude, longitude } = await getCurrentPos()
-        const data = await getHourlyWeatherByPos(latitude, longitude, apiKey)
-        return data
-    } else {
-        console.error('Geolocation is not supported by this browser.');
-    }
+async function getCityIdByName(cityName, apiKey) {
+    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${cityName}&limit=1&offset=0`
+
+    const response = await fetch(url, {
+        method: "GET",
+        headers: {
+            "x-rapidapi-key": apiKey,
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com"
+        }
+    })
+
+    const result = await response.json()
+    return result.data[0]?.id || null
 }
 
 
@@ -141,6 +200,67 @@ function setCurrentWeather(data) {
 
 
 
+function setHourlyWeather(data) {
+    const hourlyWeather = document.getElementById("hourlyWeather")
+    data = data.list.slice(0, 6)
+
+    let weather = ""
+
+    data.forEach(item => {
+        const icon = item.weather[0].icon
+        const temp = Math.round(item.main.temp.toFixed(1))
+        const feelsLike = Math.round(item.main.feels_like.toFixed(1))
+        const wind = Math.round((item.wind.speed * 3.6).toFixed(1))
+        const windDirection = getWindDirection(item.wind.deg)
+
+        weather += `<div style="width: 110px; display: flex; flex-direction: column;">
+                        <p style="font-size: 1.05em;" class="text-body-secondary">${item.dt_txt.split(' ')[1].slice(0, 5)}</p>
+                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png">
+                        <p style="font-size: 1.05em; flex-grow: 1;" class="text-body-secondary">${item.weather[0].description}</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${temp}°</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${feelsLike}°</p>
+                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${wind} ${windDirection}</p>
+                    </div>`
+    })
+    hourlyWeather.innerHTML = weather
+}
+
+
+
+function setNearbyWeather(data)
+{
+    const nearbyWeather = document.getElementById("nearbyWeather")
+    
+    let weather = ""
+
+    data.forEach(item => {
+        weather += `<div class="d-flex m-1" style="justify-content: space-between; align-items: center; background-color: rgb(130, 177, 179); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1); box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.19); border-radius: 5px;">
+                        <p class="text-body-secondary p-2 ms-2">${item.cityName}</p>
+                        <div class="me-4" style="display: flex; align-items: center;">
+                            <img class="me-3" style="height: 30px;" src="https://openweathermap.org/img/wn/${item.icon}@2x.png"/>
+                            <p class="text-body-secondary">${item.temp}°C</p>
+                        </div>
+                    </div>`
+    })
+
+    nearbyWeather.innerHTML = weather
+}
+
+
+
+async function getCurrentPos() {
+    return await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(position => {  
+            const {latitude, longitude} = position.coords
+            resolve({latitude, longitude})
+        }, (error) => {
+            reject(error)
+        })
+    });  
+}
+
+
+
 function formatDate(timestamp) {
     const date = new Date(timestamp * 1000)
     return `${date.getFullYear()}.` + 
@@ -167,80 +287,15 @@ function getDifference(time1, time2) {
 
 
 
-function setHourlyWeather(data) {
-    const hourlyWeather = document.getElementById("hourlyWeather")
-    data = data.list.slice(0, 6)
-
-    let weather = ""
-
-    data.forEach(item => {
-        const icon = item.weather[0].icon
-        const temp = Math.round(item.main.temp.toFixed(1))
-        const feelsLike = Math.round(item.main.feels_like.toFixed(1))
-        const wind = (item.wind.speed * 3.6).toFixed(1)
-
-        weather += `<div style="width: 110px; display: flex; flex-direction: column;">
-                        <p style="font-size: 1.05em;" class="text-body-secondary">${item.dt_txt.split(' ')[1].slice(0, 5)}</p>
-                        <img src="https://openweathermap.org/img/wn/${icon}@2x.png">
-                        <p style="font-size: 1.05em; flex-grow: 1;" class="text-body-secondary">${item.weather[0].description}</p>
-                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${temp}°</p>
-                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${feelsLike}°</p>
-                        <hr class="mt-2 mb-2"><p class="text-body-secondary">${wind}</p>
-                    </div>`
-    })
-    hourlyWeather.innerHTML = weather
-}
-
-
-
-async function getNearbyPlaces(apiKey)
-{
-    const { latitude, longitude } = await getCurrentPos()
-    const limit = 6
-    const url = `https://wft-geo-db.p.rapidapi.com/v1/geo/locations/${latitude}+${longitude}/nearbyPlaces?limit=${limit}&offset=0&types=CITY&radius=100`
-    const responce = await fetch(url, {
-        method: "GET",
-        headers: {
-            "x-rapidapi-key": "ae64cde335msh0c4fb4f82e854b1p1556ffjsn3b5d3d5f7d67",
-            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com"
-        }
-    })
-    const result = await responce.json()
-    const cities = result.data
-    const data = await Promise.all(
-        cities.map(async city => {
-            const lat = city.latitude;
-            const lon = city.longitude;
-            const weatherData = await getCurrentWeatherByPos(lat, lon, apiKey);
-            return {
-                cityName: city.name,
-                icon: weatherData.weather[0].icon,
-                temp: Math.round(weatherData.main.temp)
-            };
-        })
-    );
-    return data
-}
-
-
-
-function setNearbyPlaces(data)
-{
-    const nearbyWeather = document.getElementById("nearbyWeather")
-    
-    let weather = ""
-
-    data.forEach(item => {
-        weather += `<div class="d-flex m-1" style="justify-content: space-between; align-items: center; background-color: rgb(130, 177, 179); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1); box-shadow: inset -2px -2px 1px rgba(255, 255, 255, 0.19); border-radius: 5px;">
-                        <p class="text-body-secondary p-2 ms-2">${item.cityName}</p>
-                        <div class="me-4" style="display: flex; align-items: center;">
-                            <img class="me-3" style="height: 30px;" src="https://openweathermap.org/img/wn/${item.icon}@2x.png"/>
-                            <p class="text-body-secondary">${item.temp}°C</p>
-                        </div>
-                    </div>`
-    })
-
-    nearbyWeather.innerHTML = weather
+function getWindDirection(deg) {
+    const directions = [
+        'N', 'NNE', 'NE', 'ENE',
+        'E', 'ESE', 'SE', 'SSE',
+        'S', 'SSW', 'SW', 'WSW',
+        'W', 'WNW', 'NW', 'NNW'
+    ];
+    const index = Math.round(deg / 22.5) % 16;
+    return directions[index];
 }
 
 
